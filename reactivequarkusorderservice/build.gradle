@@ -20,7 +20,7 @@ dependencies {
 
     implementation 'io.quarkus:quarkus-hibernate-reactive'
     implementation 'io.quarkus:quarkus-hibernate-reactive-panache'
-    implementation 'io.quarkus:quarkus-reactive-pg-client'
+    implementation 'io.quarkus:quarkus-reactive-pg-client:999-SNAPSHOT'
     implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
     implementation 'io.quarkus:quarkus-grpc'
     annotationProcessor("io.quarkus:quarkus-panache-common")

@@ -11,7 +11,7 @@ export VAULT_TOKEN=
 vault auth enable userpass
 vault write auth/userpass/users/bob password=sinclair policies=vault-quickstart-policy
 vault secrets enable database
-vault write database/config/mydb plugin_name=postgresql-database-plugin allowed_roles=mydbrole connection_url=postgresql://{{username}}:{{password}}@192.168.1.57:5433/mydatabase?sslmode=disable username=sarah password=connor
+vault write database/config/mydb plugin_name=postgresql-database-plugin allowed_roles=mydbrole connection_url=postgresql://{{username}}:{{password}}@192.168.1.58:5433/mydatabase?sslmode=disable username=sarah password=connor
 
 cat <<EOF > vault-postgres-creation.sql
 CREATE ROLE "{{name}}" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
