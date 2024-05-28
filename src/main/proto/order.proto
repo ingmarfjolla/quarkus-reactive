@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.ing.proto";
+option java_outer_classname = "OrderGrpcProto";
+
+package orders;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+// order is a list of items
+// order item will be food or drink..
+
+service Order {
+  // Creates an order and returns the new order's id
+  rpc CreateOrder (CreateOrderRequestMessage) returns (CreateOrderResponseMessage) {};
+
+  // DeletesOrder
+  rpc CancelOrder(DeleteOrderRequestMessage) returns (google.protobuf.Empty) {};
+  // Gets an order by order number
+  rpc GetOrderByNumber(GetOrderByNumberRequestMessage) returns (OrderResponseMessage){};
+
+  // Updates an order
+  rpc UpdateOrder(UpdateOrderRequestMessage) returns (google.protobuf.Empty){};
+}
+
+// The request message to create an order
+message CreateOrderRequestMessage {
+  string customer_id = 1;
+  OrderRequestMessage order = 2;
+}
+
+// The response message when creating an order
+message CreateOrderResponseMessage {
+
+  string generic_order_response = 1;
+}
+
+//The request message to delete an order
+//should require the ID
+message DeleteOrderRequestMessage{
+  string order_id =1;
+}
+
+// The request message to get an order by order number
+//get order by number
+message GetOrderByNumberRequestMessage{
+  string customer_id = 1;
+  string order_number = 2;
+}
+
+
+// The request message to get an order by requester info
+message UpdateOrderRequestMessage{
+  string customer_id = 1;
+  string order_number = 2;
+  OrderRequestMessage order = 3;
+}
+
+// The order message used in requests
+message OrderRequestMessage {
+  //person who ordered it (the customer )
+  string customer = 1;
+  //cost of order
+  int32 cost = 2;
+  //order status
+  OrderStatusEnum status = 3;
+  //timestamp - auto generated
+  google.protobuf.Timestamp creation_time = 4;
+  //all the food in an order
+  repeated OrderItemMessage items = 5;
+}
+
+// The order message used in responses
+message OrderResponseMessage {
+  string customer = 1;
+
+}
+
+// The order item message
+message OrderItemMessage {
+  string sku_id = 1;
+  int32 quantity = 2;
+  string type = 3;
+  int32 cost = 4;
+  string name = 5;
+
+}
+
+//The order statuses
+enum OrderStatusEnum {
+  UNKNOWN = 0;
+  //in progress, this will be modified by another service perhaps
+  ORDERED = 1;
+  //finished
+  COMPLETED = 2;
+}
