@@ -11,17 +11,12 @@ repositories {
 dependencies {
     implementation platform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
 
-//    implementation('io.debezium:debezium-quarkus-outbox-reactive:2.2.0-SNAPSHOT')
+    implementation 'io.debezium:debezium-quarkus-outbox-reactive:2.6.2.Final'
 //    implementation('io.quarkiverse.vault:quarkus-vault')
-
-
     implementation 'io.quarkus:quarkus-hibernate-reactive-panache'
     implementation 'io.quarkus:quarkus-reactive-pg-client'
     implementation 'io.quarkus:quarkus-rest-jackson'
     implementation 'io.quarkus:quarkus-grpc'
-
-
-//    implementation 'io.cdc:cdc-quarkus-outbox'
     implementation 'io.quarkus:quarkus-resteasy-reactive'
 //    implementation 'io.quarkus:quarkus-smallrye-reactive-messaging-kafka'
 
