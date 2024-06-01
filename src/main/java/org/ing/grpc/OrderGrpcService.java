@@ -10,8 +10,7 @@ import org.ing.repository.converters.OrderMessageConverter;
 @GrpcService
 public class OrderGrpcService extends MutinyOrderGrpc.OrderImplBase{
     OrderService orderService;
-//    @Inject
-//    Event<ExportedEvent<String, JsonNode>> event;
+
     public OrderGrpcService(OrderService orderService){
         this.orderService=orderService;
     }
