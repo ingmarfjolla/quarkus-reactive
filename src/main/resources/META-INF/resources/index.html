@@ -4,16 +4,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Quarkus Chat!</title>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly-additions.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly-additions.min.css">
 
     <style>
         #chat {
-          resize: none;
-          overflow: hidden;
-          min-height: 300px;
-          max-height: 300px;
-      }
+            resize: none;
+            overflow: hidden;
+            min-height: 300px;
+            max-height: 300px;
+            border: 1px solid darkslategray;
+            margin-bottom: 1em;
+            padding: 1em;
+        }
+
+        .message {
+
+        }
+
+        .system-message {
+            font-weight: bold;
+        }
+
+        .user {
+            font-weight: bold;
+            color: cornflowerblue;
+        }
+
+        .system-user {
+            font-weight: bold;
+            color: deeppink;
+        }
     </style>
 </head>
 
@@ -34,7 +57,7 @@
         <br/>
     </div>
     <div class="row">
-        <textarea class="col-md-8" id="chat"></textarea>
+        <div class="col-md-8" id="chat"></div>
     </div>
     <div class="row">
         <input class="col-md-6" id="msg" type="text" placeholder="enter your message">
@@ -48,64 +71,91 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/js/patternfly.min.js"></script>
 
 <script type="text/javascript">
-    var connected = false;
-    var socket;
+    // State
+    let connected = false;
+    let socket;
+    let username = "";
 
-    $( document ).ready(function() {
+
+
+    $(document).ready(function () {
+        let name = $("#name");
+
         $("#connect").click(connect);
-        $("#send").click(sendMessage);
+        $("#send").click(send);
 
-        $("#name").keypress(function(event){
-            if(event.keyCode == 13 || event.which == 13) {
+        name.keypress(function (event) {
+            if (event.keyCode == 13 || event.which == 13) {
                 connect();
             }
         });
 
-        $("#msg").keypress(function(event) {
-            if(event.keyCode == 13 || event.which == 13) {
-                sendMessage();
+        $("#msg").keypress(function (event) {
+            if (event.keyCode == 13 || event.which == 13) {
+                send();
             }
         });
 
-      $("#chat").change(function() {
-          scrollToBottom();
+        $("#chat").change(function () {
+            scrollToBottom();
         });
 
-        $("#name").focus();
+        name.focus();
     });
 
-    var connect = function() {
-        if (! connected) {
-            var name = $("#name").val();
-            console.log("Val: " + name);
-            socket = new WebSocket("ws://" + location.host + "/chat/" + name);
-            socket.onopen = function() {
+    let connect = function () {
+        if (!connected) {
+            let name = $("#name");
+            username = name.val();
+            socket = new WebSocket("ws://" + location.host + "/chat/" + username);
+            socket.onopen = function () {
                 connected = true;
                 console.log("Connected to the web socket");
                 $("#send").attr("disabled", false);
                 $("#connect").attr("disabled", true);
-                $("#name").attr("disabled", true);
+                name.attr("disabled", true);
                 $("#msg").focus();
             };
-            socket.onmessage =function(m) {
-                console.log("Got message: " + m.data);
-                $("#chat").append(m.data + "\n");
+            socket.onmessage = function (m) {
+                const chatMessage = JSON.parse(m.data);
+                let chat = $("#chat");
+                switch (chatMessage.type) {
+                    case "USER_JOINED":
+                        if (chatMessage.from !== username) {
+                            chat.append(`<span class='system-message'>${chatMessage.from} joined the chatroom.</span><br>`);
+                        } else {
+                            chat.append(`<span class='message'></span><span class='system-user'>System</span> : Howdy <span class="user">${chatMessage.from}</span>!.</span><br>`);
+                        }
+                        break;
+                    case "USER_LEFT":
+                        chat.append(`<span class='system-message'>${chatMessage.from} left the chatroom.</span><br>`);
+                        break;
+                    case "CHAT_MESSAGE":
+                        chat.append(`<span class='message'></span><span class='user'>${chatMessage.from}</span> : ${chatMessage.message} </span><br>`);
+                        break;
+                }
                 scrollToBottom();
             };
         }
     };
 
-    var sendMessage = function() {
+    let send = function () {
         if (connected) {
-            var value = $("#msg").val();
-            console.log("Sending " + value);
-            socket.send(value);
-            $("#msg").val("");
+            let msg = $("#msg");
+            var value = msg.val();
+            var chatMessage = {
+                type: "CHAT_MESSAGE",
+                from: username,
+                message: value
+            };
+            socket.send(JSON.stringify(chatMessage));
+            msg.val("");
         }
     };
 
-    var scrollToBottom = function () {
-      $('#chat').scrollTop($('#chat')[0].scrollHeight);
+    let scrollToBottom = function () {
+        let chat = $('#chat');
+        chat.scrollTop(chat[0].scrollHeight);
     };
 
 </script>
